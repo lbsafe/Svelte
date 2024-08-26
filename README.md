@@ -5,8 +5,7 @@
 ## Svelte란?
 
 >스벨트(Svelte)는 자바스크립트 라이브러리 중 하나로, React보다 가볍고 Vue보다 쉽다는 장점을 내세운 최신 프론트엔드 기술이다.  
-실제 DOM과 가상 DOM을 비교하여 변경 사항을 실제 DOM으로 업데이트하는 방식으로 작동하는 React나 Vue와 다르게  
-Svelte는 이 과정을 생략하고 바로 실제 DOM을 반영한다. Svelte는 앱을 실행 시점(Run time)에서 해석하지 않고 빌드 시점에서 Vanilla JavaScript Bundle로 컴파일하여 속도가 빠르고 따로 라이브러리를 배포할 필요가 없어 간편하다.
+실제 DOM과 가상 DOM을 비교하여 변경 사항을 실제 DOM으로 업데이트하는 방식으로 작동하는 React나 Vue와 다르게 Svelte는 이 과정을 생략하고 바로 실제 DOM을 반영한다. Svelte는 앱을 실행 시점(Run time)에서 해석하지 않고 빌드 시점에서 Vanilla JavaScript Bundle로 컴파일하여 속도가 빠르고 따로 라이브러리를 배포할 필요가 없어 간편하다.
 
 ***
 
