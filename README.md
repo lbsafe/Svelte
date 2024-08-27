@@ -294,7 +294,6 @@ let objectArray = [ // 객체의 배열
                 done: true
             }
         ]
-
     </script>
 
     <main>
@@ -450,5 +449,365 @@ export const count = createCount(); // count에 연결
 </script>
 
 <button on:click={onIncre}>+</button>
+```
+***
+
+## slot
+
+> 상태값과 별개로 마크업 영역에서 html을 반복적으로 재사용할 때 사용하는 기능.  
+동일한 레이아웃의 컴포넌트 내부 html 이 변경 될 때 사용한다.
+
+**사용 방법**
+
+1. slot을 사용할 컴포넌트에 필요한 디자인 요소(style)을 작성 후 slot을 태그의 형태로 넣어 준다.
+
+2. slot을 사용할 컴포넌트에서 slot을 작성한 컴포넌트를 import 한다.
+
+3. import 한 컴포넌트를 마크업으로 불러온 후 그 사이에 원하는 html으로 이루어진 내용을 입력한다.
+
+>컴포넌트로 불러와 작성한 내용이 slot 으로 정의 된 부분에 배치되는 것이다.
+
+```js
+// card.svelte
+// slot 기능을 사용할 컴포넌트
+<style>
+    .card{
+        width: 300px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 1em;
+        margin: 0 0 1em 0;
+    }
+</style>
+
+<div class="card">
+    <slot />
+</div>
+```
+
+```js
+<script>
+    import Card from "./components/card.svelte";
+</script>
+
+// 불러온 컴포넌트에 html으로 구성 된 내용 작성
+<main>
+    <Card>
+        <h2>안녕하세요!</h2>
+        <p>이곳은 내용이 들어가는 영역입니다.</p>
+    </Card>
+
+    <Card>
+        <h2>Hello Svelte</h2>
+        <p>slot</p>
+        <p>사용하기</p>
+    </Card>
+</main>
+```
+
+### slot - name
+
+> slot의 name 옵션을 이용해 slot을 사용하는 곳에서 명시적으로 배치할 slot을 지정할 수 있다.
+
+**사용 방법**
+
+1. style 영역을 먼저 만들고 css 작성
+
+2. 마크업 영역에 slot을 만들고 각각 name 옵션을 사용한다.
+
+3. 사용하지 않을 slot에 관한 기본값을 설정해준다.
+
+4. slot을 만든 컴포넌트를 사용할 곳에서 name 옵션을 이용해 명시적으로 배치할 slot을 지정한다.
+
+```js
+// card.svelte
+<style>
+    // style css
+</style>
+
+// name 옵션을 이용한
+// name, address, email 3가지 slot 영역 생성
+// 사용하지 않을 때의 기본값 설정
+<article class="contact-card">
+    <h2>
+        <slot name="name">
+            <span class="missing">이름 미입력</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">주소 미입력</span>
+        </slot>
+    </div>
+
+    <div class="email">
+        <slot name="email">
+            <span class="missing">이메일 미입력</span>
+        </slot>
+    </div>
+</article>
+```
+
+```js
+// App.svelte
+<script>
+    import Card from "./components/card.svelte";
+</script>
+
+<main>
+    <Card>
+        <span slot="name">
+            오건희
+        </span>
+
+        <span slot="address">
+            인천광역시
+        </span>
+    </Card>
+</main>
+```
+
+## $$slots.슬롯이름
+
+> 특정 슬롯을 사용했는지 아닌지를 체크하는 기능.  
+정보의 유무를 체크하고 이를 통해 특정 영역을 보이고 안보이게 하거나 스타일 요소를 첨부할 수 있다.
+
+**사용 방법**
+
+조건 블록 ```{#if...}```과 ```##slots.슬롯이름``` 을 사용하여 해당 slot의 사용 유무에 따라 나타나는 내용의 형태를 변경할 수 있다.
+
+```js
+// card.svelte
+<style>
+    // style css
+</style>
+
+<article class="contact-card">
+    <h2>
+        <slot name="name">
+            <span class="missing">이름 미입력</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">주소 미입력</span>
+        </slot>
+    </div>
+
+    <!-- 조건 블록을 통한 email slot의 사용 여부 확인 -->
+    {#if $$slots.email}
+        <div class="email">
+            <hr />
+            <slot name="email"></slot>
+        </div>
+    {/if}
+</article>
+```
+
+```js
+// App.svelte
+<script>
+    import Card from "./components/card.svelte";
+</script>
+
+<main>
+    <Card>
+        <span slot="name">
+            오건희
+        </span>
+
+        <span slot="address">
+            인천광역시
+        </span>
+    </Card>
+
+    <Card>
+        <span slot="name">
+            오건희
+        </span>
+
+        <span slot="address">
+            인천광역시
+        </span>
+
+        <span slot="email">
+            email@test.com
+        </span>
+    </Card>
+</main>
+```
+
+### slot을 이용한 동적 기능
+
+> slot으로 만들어진 부분에 특정한 이벤트를 준다.
+
+```js
+<style>
+    // style
+    .hovering{background-color: #ffed99;}
+</style>
+
+<script>
+    // hovering 상태값
+    let hovering = false;
+    // 변경 메소드
+    const enter = ()=> hovering = true; 
+    const leave = ()=> hovering = false;
+</script>
+
+// class:hovering => hovering이 ture 일때 css 적용
+// 마우스 이벤트 on:mouseenter={enter} on:mouseleave={leave}
+<article class="contact-card" class:hovering on:mouseenter={enter} on:mouseleave={leave}>
+    <h2>
+        <slot name="name">
+            <span class="missing">이름 미입력</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">주소 미입력</span>
+        </slot>
+    </div>
+
+    {#if $$slots.email}
+        <div class="email">
+            <hr />
+            <slot name="email"></slot>
+        </div>
+    {/if}
+</article>
+```
+
+```js
+// App.svelte
+// 실행 시 card 컴포넌트에 마우스 이벤트 발생
+<script>
+    import Card from "./components/card.svelte";
+</script>
+
+<main>
+    <Card>
+        <span slot="name">
+            오건희
+        </span>
+
+        <span slot="address">
+            인천광역시
+        </span>
+    </Card>
+</main>
+```
+
+### slot 에 상태값 전달하기
+
+**주의 사항**
+* slot의 let: 문법은 형제 컴포넌트 간에 사용이 가능하다.
+* 부모-자식 컴포넌트에서는 props나 Context API를 활용한다.
+
+**사용 방법**
+
+1. 상태값을 전달하고자 하는 slot에 props를 전달하듯이 {}를 이용한다.
+
+2. 전달받을 컴포넌트에서는 ```let:상태값```을 이용해 값을 받는다.
+
+```js
+<style>
+    // style
+</style>
+
+<script>
+    let hovering = false;
+    const enter = ()=> hovering = true;
+    const leave = ()=> hovering = false;
+</script>
+
+<article class="contact-card" class:hovering on:mouseenter={enter} on:mouseleave={leave}>
+    <h2>
+        <slot name="name">
+            <span class="missing">이름 미입력</span>
+        </slot>
+    </h2>
+
+    <div class="address">
+        <slot name="address">
+            <span class="missing">주소 미입력</span>
+        </slot>
+    </div>
+
+    <!-- slot에 대괄호를 이용한 상태값 전달 -->
+    {#if $$slots.email}
+        <div class="email">
+            <hr />
+            <slot {hovering} name="email"></slot>
+        </div>
+    {/if}
+</article>
+```
+
+```js
+<script>
+    import Card from "./components/card.svelte";
+</script>
+
+<main>
+    <!-- 컴포넌트에 let:을 통해 상태값을 받아온다. -->
+    <Card let:hovering>
+        <span slot="name">
+            오건희
+        </span>
+
+        <span slot="address">
+            인천광역시
+        </span>
+
+        <!-- 전달 받은 상태 값을 응용해 내용을 수정할 수 있다. -->
+        <span slot="email">
+            {#if hovering}
+                <b>email@test.com</b>
+            {:else}
+                email@test.com
+            {/if}
+        </span>
+    </Card>
+</main>
+```
+
+### svelte:fragment
+
+> slot 을 사용하기 위해 불필요한 DOM 요소로 감싸지 않고, 바로 slot 을 사용하는 방법
+
+**사용 방법**
+
+* 기존 불필요한 DOM 요소를 ```svelte:fragment``` 로 감싸준다.
+
+```js
+// widget.svelte
+<div>
+    <slot name="header">header</slot>
+    <p>some content between header, footer</p>
+    <slot name="footer">footer</slot>
+</div>
+```
+
+```js
+// App.svelte
+<script>
+    import Widget from "./components/widget.svelte";
+</script>
+
+<main>
+    <Widget>
+        <header slot="header">header</header>
+        <!-- svelte:fragment 사용 -->
+        <svelte:fragment slot="footer">
+            <p>All rights reserved.</p>
+            <p>Copyright</p>
+        </svelte:fragment>
+    </Widget>
+</main>
 ```
 ***
